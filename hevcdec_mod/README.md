@@ -2,7 +2,7 @@ NOTE:
 
 The attached file hevcdec_mod.c is a modification of hevcdec.c from ffmpeg 7.1 (libavcodec/hevc/)
 
-Modification are from me (HG) and stg7 repository https://github.com/stg7/hevc_bitstreamparser
+Modifications are from me (HG) and stg7 repository https://github.com/stg7/hevc_bitstreamparser
 
 Use the modified version only with hevcqp script
 
