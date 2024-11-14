@@ -8,7 +8,7 @@ Use the modified version only with hevcqp script
 
 ****************************
 
-Instruction for compiling ffprobe_mod.exe
+Instructions for compiling ffprobe_mod.exe
 
 - Create an environment to build ffmpeg (static). E.g. on Windows follow step-by-step instructions here: https://www.youtube.com/watch?v=OIYGjzmJ2GI (thanks to DevStefIt). Pause before compiling ffmpeg.
 - Copy the following modifications from hevcdec_mod.c into ffmpeg hevcdec.c
