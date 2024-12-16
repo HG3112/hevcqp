@@ -7,9 +7,13 @@ USAGE:
 2) hevcqp.exe inputFile outputStatsFile
 
 This script displays on stdout general QP statistics for hevc/h264 video in inputFile
+
 Optionally, it writes detailed statistics for each frame in outputStatsFile
+
 Log messages are on stderr
+
 Requires ffmpeg.exe and ffprobe or ffprobe_mod.exe in same (current) dir or PATH
+
 See readme for compiling ffprobe_mod.exe
 
 Instructions for compiling ffprobe_mod are in hevcdec_mod folder.
