@@ -1,2 +1,5 @@
+241216
+- Added support for h264
+
 241114
 - First release.
