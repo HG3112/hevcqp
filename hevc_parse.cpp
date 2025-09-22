@@ -81,6 +81,7 @@ int hevc_parse(frame** fp, char* file_string)
 			currentFrameB->avg_qp /= mbcount;
 			currentFrameB->stdevQ_qp /= mbcount;
 			currentFrameB->stdevQ_qp -= currentFrameB->avg_qp * currentFrameB->avg_qp;
+			currentFrameB->macroblocks = mbcount;
 		}
 		else if (strstr(line, "[FRAME]") == line)
 		{
@@ -145,7 +146,8 @@ int hevc_parse(frame** fp, char* file_string)
 
 	//COMPARE ffprobe vs hevcdec
 	_pclose(pipe);
-	if (currentFrameA!=NULL) if (currentFrameA->type == 'B') fprintf(stderr, "[LOG] ** W A R N I N G ** Last frame is a B frame. Analysis could be wrong\n");
+	if (currentFrameA!=NULL) if (currentFrameA->type == 'B')
+		fprintf(stderr, "[LOG] ** W A R N I N G ** Last frame is a B frame. Analysis could be wrong\n");
 	fprintf(stderr, "[LOG] Frames counted: %d ---  Frames decoded: %d\n", frameCountA, frameCountB);
 	if (frameCountB < frameCountA)
 	{
@@ -185,6 +187,7 @@ int hevc_parse(frame** fp, char* file_string)
 		arrayB[x].marked = 0;
 		arrayB[x].minqp = chainB->minqp;
 		arrayB[x].maxqp = chainB->maxqp;
+		arrayB[x].macroblocks = chainB->macroblocks;
 
 		currentFrameA = chainA->next;
 		currentFrameB = chainB->next;
@@ -209,6 +212,7 @@ int hevc_parse(frame** fp, char* file_string)
 		arrayA[x].stdevQ_qp = arrayB[c].stdevQ_qp;
 		arrayA[x].minqp = arrayB[c].minqp;
 		arrayA[x].maxqp = arrayB[c].maxqp;
+		arrayA[x].macroblocks = arrayB[c].macroblocks;
 
 		if (arrayB[c].marked == 1)
 		{
@@ -226,7 +230,7 @@ int hevc_parse(frame** fp, char* file_string)
 			}
 		}
 	}
-	for (x = 0; x < counter; x++)
+	for (x = 0; x < counter; x++)// check all frames have been counted
 	{
 		if (arrayB[x].marked == 0)
 		{

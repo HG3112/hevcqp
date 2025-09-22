@@ -98,6 +98,7 @@ void threadF(shared* sD)
 			currentFrameB->avg_qp /= mbcount;
 			currentFrameB->stdevQ_qp /= mbcount;
 			currentFrameB->stdevQ_qp -= currentFrameB->avg_qp * currentFrameB->avg_qp;
+			currentFrameB->macroblocks = mbcount;
 		}
 	}
 	delete[] line;
@@ -143,7 +144,8 @@ int h264_parse(frame** fp, char* file_string, std::string ffprobe_ext)
 	fprintf(stderr, cmd.c_str());
 	cmd = std::string("ffmpeg.exe -hide_banner -loglevel error -threads 1 -i \"")
 		+ std::string(file_string)
-		+ std::string("\" -map 0:V:0 -c:v copy -f h264 pipe: | ffprobe")+ffprobe_ext+std::string(" -threads 1 -v quiet -show_frames -show_streams -show_entries frame=key_frame,pkt_pos,pkt_size,pict_type -debug qp -i pipe: 2>>\\\\.\\pipe\\ffprobe_stderr_PID")
+		+ std::string("\" -map 0:V:0 -c:v copy -f h264 -bsf:v h264_mp4toannexb pipe: | ffprobe")
+		+ffprobe_ext+std::string(" -threads 1 -v quiet -show_frames -show_streams -show_entries frame=key_frame,pkt_pos,pkt_size,pict_type -debug qp -i pipe: 2>>\\\\.\\pipe\\ffprobe_stderr_PID")
 		+ std::to_string(pid);
 	sharedData.pipeA = _popen(cmd.c_str(), "rb");
 	if (sharedData.pipeA == NULL)
@@ -240,11 +242,8 @@ int h264_parse(frame** fp, char* file_string, std::string ffprobe_ext)
 
 	//ORGANIZE ARRAY
 	frame* arrayA = new frame[counter];
-	//frameB* arrayB = new frameB[counter];
 	*fp = arrayA;
 
-	//*fp = new frame[counter];
-	//frame* f = *fp;
 	currentFrameA = sharedData.chainA;
 	currentFrameB = sharedData.chainB;
 	for (x=0;x<counter;x++)
@@ -256,6 +255,7 @@ int h264_parse(frame** fp, char* file_string, std::string ffprobe_ext)
 		arrayA[x].stdevQ_qp = currentFrameB->stdevQ_qp;
 		arrayA[x].minqp = currentFrameB->minqp;
 		arrayA[x].maxqp = currentFrameB->maxqp;
+		arrayA[x].macroblocks = currentFrameB->macroblocks;
 		sharedData.chainA = currentFrameA;
 		sharedData.chainB = currentFrameB;
 		currentFrameA = currentFrameA->next;
@@ -263,6 +263,5 @@ int h264_parse(frame** fp, char* file_string, std::string ffprobe_ext)
 		delete sharedData.chainA;
 		delete sharedData.chainB;
 	}
-
 	return counter;
 }

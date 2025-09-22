@@ -1,4 +1,4 @@
-#define BUILD 241216
+#define BUILD 250922
 
 #include <stdio.h>
 #include <math.h>
@@ -12,8 +12,6 @@
 
 int main(int argv, char** argc)
 {
-	//////////////////////////////////////////////////////////////////////////// M A I N //////
-
 	FILE* pipe;
 
 	std::string ffprobe_ext;
@@ -39,7 +37,7 @@ int main(int argv, char** argc)
 		printf("Optionally, it writes detailed statistics for each frame in outputStatsFile\n");
 		printf("Log messages are on stderr\n");
 		printf("Requires ffmpeg.exe and ffprobe or ffprobe_mod.exe in same (current) dir or PATH\n");
-		printf("See readme for compiling ffprobe_mod.exe\n\n");
+		//printf("See readme for compiling ffprobe_mod.exe\n\n");
 		return 0;
 	}
 
@@ -146,8 +144,28 @@ int main(int argv, char** argc)
 	double stdevF;
 	double stdevMB;
 	double tmpd;
+	const char* filename = argc[1];
+	while (*filename != 0) { filename++; }
+	fprintf(stderr,filename);
+	while ((*filename != '\\') && (filename != argc[1]) ) filename--;
+	if (*filename == '\\') filename++;
 
 	fprintf(stderr, "[LOG] WRITING STATISTIC TO STDOUT\n");
+	printf("hevcqp report - Build %d - by HG\n\n", BUILD);
+	printf("Input file            : %s\n", filename);
+	printf("Codec                 : ");
+	if (flagh == 1) //h264
+	{
+		printf("h264 (");
+		if (flag10 == 0)
+			printf("8bit)\n");
+		else
+			printf("10bit)\n");
+	}
+	else
+		printf("hevc\n");
+
+	printf("Macroblocks per frame : %d\n\n", f[0].macroblocks);
 	for (x = 0; x < l; x++)
 	{
 		n = 0;
@@ -186,21 +204,30 @@ int main(int argv, char** argc)
 		stdevMB /= n;
 		stdevF = sqrt(stdevF);
 		stdevMB = sqrt(stdevMB);
-		if (type[x] == '0') printf("TOT");
+		if (type[x] == '0') printf("General statistics");
 		else if (type[x] == '1') printf("K+I");
 		else if (type[x] == '2') printf("P+B");
 		else putchar(type[x]);
 		printf(":\n");
 
-		printf("N               : %d\n", n);
-		printf("N/TOT           : %f %%\n", 100.0 * (double)(n) / (double)(frameN));
-		printf("Total Size      : %s\n", std::to_string(totalSize).c_str());
-		printf("Total Size/TOT  : %f %%\n", 100.0 * (double)(totalSize) / (double)(totaltotalSize));
-		printf("Average Size    : %f\n", mSize);
-		printf("AVERAGE QP      : %f\n", mQP-flag12d);
-		printf("StdDev (frames) : %f\n", stdevF);
-		printf("StdDev (MB)     : %f\n\n", stdevMB);
+		printf("Number of frames      : %d", n);
+		if (type[x] != '0')
+			printf(" ( %f %% )", 100.0 * (double)(n) / (double)(frameN));
+		printf("\n");
+		printf("Total Size            : %s", std::to_string(totalSize).c_str());
+		if (type[x] != '0')
+			printf(" ( %f %% )", 100.0 * (double)(totalSize) / (double)(totaltotalSize));
+		printf("\n");
+		printf("Average Size          : %f\n", mSize);
+		printf("AVERAGE QP            : %f\n", mQP-flag12d);
+		printf("StdDev (frames)       : %f\n", stdevF);
+		printf("StdDev (MB)           : %f\n\n", stdevMB);
+
+		if (type[x] == '0') printf("--------------------------------\n\n");
 	}
+
+	printf("--------------------------------\n\n");
+
 	//CONSECUTIVE B
 	double totB = 0.0;
 	int maxB = 0;
@@ -227,11 +254,14 @@ int main(int argv, char** argc)
 		maxB = (ccounterB > maxB ? ccounterB : maxB);
 		totB = totB + ccounterB;
 	}
-	printf("Consecutive B-Frames (number of B-Frames in each group) :");
+	printf("Consecutive B-Frames (number of B-Frames in each group)");
 	if (maxB == 0) printf("  # N/A");
 	printf("\n");
 	for (x = 0; x < maxB; x++)
+	{
+		if ( (x < 9) && (maxB>9)) printf(" ");
 		printf("%d : %d ( %f %% )\n", x + 1, cBf[x], 100.0 * cBf[x] / totB);
+	}
 	delete[] cBf;
 
 	//PER FRAME STATISTICS
@@ -246,7 +276,22 @@ int main(int argv, char** argc)
 			return ERR_OUTPUT_STATS;
 		}
 		fprintf(stderr, "[LOG] WRITING PER-FRAME STATS FILE\n");
-		fputs(std::to_string(frameN).c_str(), out);//frames number at first line
+		fputs(filename, out);
+		fputc('\n', out);
+		if (flagh == 1) //h264
+		{
+			fputs("h264 (",out);
+			if (flag10 == 0)
+				fputs("8bit)\n",out);
+			else
+				fputs("10bit)\n",out);
+		}
+		else
+			fputs("hevc\n",out);
+
+		fputs(std::to_string(frameN).c_str(), out);//frames number
+		fputc('\t', out);
+		fputs(std::to_string(f[0].macroblocks).c_str(), out);//macroblocks per frame
 		fputc('\n', out);
 		for (y = 0; y < frameN; y++)
 		{

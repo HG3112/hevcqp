@@ -7,6 +7,7 @@
 struct frame
 {
 	char type;
+	uint32_t macroblocks;
 	uint32_t size;
 	uint64_t byte_position;
 	double avg_qp;
@@ -31,6 +32,7 @@ struct frameB
 	char marked;//for sorting hevc
 	int minqp;
 	int maxqp;
+	uint32_t macroblocks;
 
 	frameB* next;
 };
