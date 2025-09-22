@@ -1,3 +1,8 @@
+250922
+- Included ffprobe_mod binary
+- Restyled output
+- Added "-bsf:v h264_mp4toannexb" for h264 streams
+
 241216
 - Added support for h264
 
