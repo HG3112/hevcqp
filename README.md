@@ -61,7 +61,7 @@ and parses the outputs in stdout and stderr. If ffprobe_mod is not available ffp
 ********************************
 
 NOTES:
-- For fast use, drag and drop video file in DragNDropHere.bat. A .txt file with general statistic and a .dat file with per frame statistic will be generated in the same dir as the input
+- For fast use, drag and drop video file in DragNDropHere.bat. A .txt file with general statistic will be generated in the same dir as the input
 - Progress LOG messages are reported every 200 frames analyzed
 - Could not work with trimmed video, or with encoded but not presented frames. For hevc, usually the decoded frames should be +1 with respect to presented frames (see LOG messages). Last frame should not be a Bframe.
 - If ffprobe_mod is not available, h264 analysis is still possible through ffprobe. hevc analysis is available only through ffprobe_mod
