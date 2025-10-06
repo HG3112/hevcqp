@@ -18,7 +18,7 @@ Requires ffmpeg.exe and ffprobe or ffprobe_mod.exe in same (current) dir or PATH
 
 Output format for per-frame statistics (outputStatsFile):
 
-First row is number file name
+First row is file name
 
 Second row is codec type
 
