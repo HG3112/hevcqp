@@ -1,4 +1,4 @@
-#define BUILD 250922
+#define BUILD 260418
 
 #include <stdio.h>
 #include <math.h>
@@ -232,8 +232,9 @@ int main(int argv, char** argc)
 	double totB = 0.0;
 	int maxB = 0;
 	int ccounterB = 0;
-	int* cBf = new int[16];
-	for (x = 0; x < 16; x++) cBf[x] = 0;
+	int* cBf = new int[17]; //last one is for bf>16
+
+	for (x = 0; x < 17; x++) cBf[x] = 0;
 	for (y = 0; y < frameN; y++)
 	{
 		if (f[y].type == 'B')
@@ -242,7 +243,10 @@ int main(int argv, char** argc)
 		}
 		else if (ccounterB > 0)
 		{
-			if (ccounterB <= 16) cBf[ccounterB - 1] += ccounterB;
+			if (ccounterB <= 16)
+				cBf[ccounterB - 1] += ccounterB;
+			else
+				cBf[16] += ccounterB;
 			maxB = (ccounterB > maxB ? ccounterB : maxB);
 			totB = totB + ccounterB;
 			ccounterB = 0;
@@ -250,17 +254,27 @@ int main(int argv, char** argc)
 	}
 	if (ccounterB > 0)
 	{
-		if (ccounterB <= 16) cBf[ccounterB - 1] += ccounterB;
+		if (ccounterB <= 16)
+			cBf[ccounterB - 1] += ccounterB;
+		else
+			cBf[16] += ccounterB;
+
 		maxB = (ccounterB > maxB ? ccounterB : maxB);
 		totB = totB + ccounterB;
 	}
 	printf("Consecutive B-Frames (number of B-Frames in each group)");
 	if (maxB == 0) printf("  # N/A");
 	printf("\n");
+
+	if (maxB > 17) maxB = 17;
 	for (x = 0; x < maxB; x++)
 	{
 		if ( (x < 9) && (maxB>9)) printf(" ");
-		printf("%d : %d ( %f %% )\n", x + 1, cBf[x], 100.0 * cBf[x] / totB);
+		if ( (x < 16) && (maxB == 17)) printf(" ");
+		if (x<16)
+			printf("%d : %d ( %f %% )\n", x + 1, cBf[x], 100.0 * cBf[x] / totB);
+		else
+			printf(">16 : %d ( %f %% )\n", cBf[x], 100.0 * cBf[x] / totB);
 	}
 	delete[] cBf;
 
